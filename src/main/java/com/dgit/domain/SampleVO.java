@@ -13,7 +13,7 @@ public class SampleVO {
 		this.mno = mno;
 	}
 
-	public String getFirstName() {
+	public String getFirstName() { 
 		return firstName;
 	}
 
