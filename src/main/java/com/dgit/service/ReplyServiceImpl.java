@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dgit.domain.Criteria;
 import com.dgit.domain.ReplyVO;
 import com.dgit.persistence.ReplyDao;
 
@@ -34,6 +35,16 @@ public class ReplyServiceImpl implements ReplyService {
 	public void removeReply(int rno) throws Exception {
 		dao.delete(rno);
 
+	}
+
+	@Override
+	public List<ReplyVO> listReplyPage(int bno, Criteria cri) throws Exception {
+		return dao.listPage(bno, cri);
+	}
+
+	@Override
+	public int count(int bno) throws Exception {
+		return dao.count(bno);
 	}
 
 }

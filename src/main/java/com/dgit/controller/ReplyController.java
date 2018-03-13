@@ -1,6 +1,8 @@
 package com.dgit.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dgit.domain.Criteria;
+import com.dgit.domain.PageMaker;
 import com.dgit.domain.ReplyVO;
 import com.dgit.service.ReplyService;
 
@@ -46,6 +50,33 @@ public class ReplyController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			entity = new ResponseEntity<List<ReplyVO>>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@RequestMapping(value="/{bno}/{page}", method=RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> listPage(@PathVariable("bno") int bno, @PathVariable("page") int page){
+		ResponseEntity<Map<String,Object>> entity=null;
+		
+		try {
+			HashMap<String, Object> map=new HashMap<>();
+			
+			
+			Criteria cri=new Criteria();
+			cri.setPage(page);
+			List<ReplyVO> list=service.listReplyPage(bno, cri);
+			map.put("list", list);
+			
+			
+			PageMaker pageMaker=new PageMaker();
+			pageMaker.setCri(cri);
+			pageMaker.setTotalCount(service.count(bno));
+			map.put("pageMaker", pageMaker);
+			
+			entity=new ResponseEntity<Map<String,Object>>(map,HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			entity=new ResponseEntity<Map<String,Object>>(HttpStatus.BAD_REQUEST);
 		}
 		return entity;
 	}

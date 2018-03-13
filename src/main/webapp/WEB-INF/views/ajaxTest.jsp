@@ -6,8 +6,31 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
+<style type="text/css">
+	.pagination{
+		width:100%;
+	}
+	.pagination li{
+		list-style: none;
+		float:left;
+		padding:3px;
+		border:1px solid blue;
+		margin:3px;
+	}
+	.pagination a{
+		text-decoration: none;
+		color:black;
+	}
+	.pagination li.active a{
+		color:red;
+		background: skyblue;
+	}
+</style>
 <script type="text/javascript">
 	$(function(){
+		var page=1;
+		
 		$("#newReplyBtn").click(function(){
 			var bno=$("#bno").val();
 			var replyer=$("#replyer").val();
@@ -46,9 +69,8 @@
 			});
 		});
 		
-		$("#deleteReplyBtn").click(function(){
-			var rno=$("#rno").val();
-			
+		$(document).on("click",".deleteReplyBtn",function(){
+			var rno=$(this).parent().find(".hiddenRno").val();
 			$.ajax({
 				url:"/ex02/replies/"+rno,
 				type:"delete",
@@ -56,35 +78,66 @@
 				success:function(result){
 					console.log(result);
 					alert("삭제 성공");
+					showList();
 				}
 			});
 		});
 		
+		
 		$("#listReplyBtn").click(function(){
 			var bno=$("#bno").val();
+			
 			if(bno==""||bno==null){
 				alert("게시글 번호를 입력하세요.");
 				return;
 			}
-			
+			showList()
+		});
+		
+		function showList(){
+			var bno=$("#bno").val();
 			$.ajax({
-				url:"/ex02/replies/all/"+bno,
+				url:"/ex02/replies/"+bno+"/"+page,
 				type:"get",
 				dataType:"json",
 				success:function(json){
-					console.log(json);
+					console.log(json);					
 					$("#list").empty();
+
 					
-					var str="";
-					$(json).each(function(i,obj){
-						str+="<li>댓글번호: "+obj.rno+"<br>"
-							+"작성자: "+obj.replyer+"<br>"
-							+"댓글내용: "+obj.replytext+"</li><br><br>"
-					});
+					var source=$("#template").html();
+					var t_fn=Handlebars.compile(source);
 					
-					$("#list").append(str);
+					$("#list").html(t_fn(json));
+					printPaging(json.pageMaker);
 				}
 			});
+		}
+		
+		function printPaging(pageMaker){
+			var str="";
+			if(pageMaker.prev){
+				str+="<li><a href=''"+(pageMaker.startPage-1)+"> << </a></li>"
+			}
+			
+			for(var i=pageMaker.startPage;i<=pageMaker.endPage;i++){
+				if(pageMaker.cri.page==i){
+					str+="<li class='active'><a href='"+i+"'>"+i+"</a></li>";
+				}else{
+					str+="<li><a href='"+i+"'>"+i+"</a></li>";
+				}
+			}
+			
+			if(pageMaker.next){
+				str+="<li><a href='"+(pageMaker.endPage+1)+"'> >> </a></li>"
+			}
+			$(".pagination").html(str);
+		}
+		
+		$(".pagination").on("click","li a",function(e){
+			e.preventDefault();
+			page=$(this).attr("href");
+			showList();
 		});
 	});
 </script>
@@ -110,11 +163,39 @@
 		</div>
 		<button id="newReplyBtn">Add Reply</button>
 		<button id="modifyReplyBtn">Modify Reply</button>
-		<button id="deleteReplyBtn">Delete Reply</button>
+		
 		<button id="listReplyBtn">Show Reply List</button>
 	</div>
 	<ul id="list">
-		
+	</ul>
+	<script id="template" type="text/x-handlebars-template">
+		{{#list}}
+		<li>
+			<input class='hiddenRno' type="hidden" value="{{rno}}">
+			{{rno}}<button class="deleteReplyBtn">삭제</button><br>
+			{{replyer}}<br>
+			{{replytext}}
+		</li>
+		{{/list}}
+	</script>
+	
+	<ul class="pagination">
 	</ul>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
