@@ -18,13 +18,13 @@ public class MessageServiceTest {
 	//@Test
 	public void addMessageTest() throws Exception{
 		MessageVO vo= new MessageVO();
-		vo.setSender("user00");
+		vo.setSender("user01");
 		vo.setMessage("testtest");
-		vo.setTargetid("user01");
+		vo.setTargetid("user02");
 		service.addMessage(vo);
 	}
 	
-	//@Test
+	@Test
 	public void readMessageTest() throws Exception{
 		service.readMessage("user01", 1);
 	}

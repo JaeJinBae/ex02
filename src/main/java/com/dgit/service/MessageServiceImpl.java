@@ -2,6 +2,7 @@ package com.dgit.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dgit.domain.MessageVO;
 import com.dgit.persistence.MessageDao;
@@ -18,6 +19,7 @@ public class MessageServiceImpl implements MessageService {
 	private PointDao pointDao;
 
 	@Override
+	@Transactional
 	public void addMessage(MessageVO vo) throws Exception {
 		messageDao.create(vo);
 
@@ -25,6 +27,7 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
+	@Transactional
 	public MessageVO readMessage(String uid, int mno) throws Exception {
 		messageDao.updateState(mno);// 읽은 시간 업데이트
 		MessageVO vo = messageDao.readMessage(mno);
